@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>Studio Karuzeli AI KaruSoula Atelier</title>
+    <link rel="icon" type="image/webp" href="https://raw.githubusercontent.com/KaruSoula/assets/main/favicon.webp">
+
+    <meta property="og:title" content="Studio Karuzeli AI KaruSoula Atelier">
+    <meta property="og:description" content="Profesjonalne, piękne i stylowe karuzele - ożyw Instagrama!">
+    <meta property="og:image" content="https://raw.githubusercontent.com/KaruSoula/assets/main/karusoula-atelier-v2.webp"> 
+    <meta property="og:url" content="https://beauty.karuzelastudio.pl/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Belleza&family=Red+Hat+Display:wght@400;700&display=swap" rel="stylesheet">
+    <script src="brandConfig.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <link rel="stylesheet" href="https://cp-core-engine.pages.dev/karusoula-style-v2.css">
+</head>
+<body id="mainBody">
+<div id="password-overlay">
+    <div class="login-banner">
+        <img id="login-logo" src="" alt="Logo">
+    </div>
+    <div class="login-box">
+        <h1 id="login-heading" class="login-heading">Witaj w Studio</h1>
+        <input type="password" id="password-input" placeholder="Wpisz hasło">
+        <button id="btn-login" onclick="checkPassword()">WEJDŹ</button>
+    </div>
+</div>
+    
+<button id="backToTop" onclick="document.getElementById('tytul-edytora').scrollIntoView({behavior: 'smooth', block: 'start'})">↑</button>
+
+<div class="top-controls">
+    <a href="https://instrukcja.karuzelastudio.pl" class="contact-btn" target="_blank" rel="noopener noreferrer">Instrukcja</a>
+    <div class="top-controls-right">
+        <a href="mailto:problem@karusoula.pl" class="contact-btn">
+            ✉️ Potrzebujesz pomocy?
+        </a>
+        <div id="startup-plan-control" class="startup-plan-control">
+            <button id="btn-toggle-startup-panel" class="contact-plan-btn"><span class="startup-plan-icon" aria-hidden="true">📅</span><span data-startup-plan-label></span></button>
+            <div id="startup-plan-panel" class="startup-plan-panel">
+                <div class="startup-plan-panel-header">
+                    <div>
+                        <p class="startup-eyebrow">Asystent Rozruchu — Strateg Contentowy</p>
+                        <h3 id="startup-plan-title">Twój plan publikacji</h3>
+                    </div>
+                    <button type="button" onclick="toggleStartupPlanPanel()" class="startup-icon-button" aria-label="Zamknij plan">×</button>
+                </div>
+                <div id="startup-plan-progress" class="startup-plan-progress"></div>
+                <div id="startup-plan-list" class="startup-plan-list"></div>
+                <div id="startup-used-list" class="startup-used-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="brand-badge-pill">
+        <img id="brand-logo-img" src="" alt="Logo" class="brand-badge-logo">
+        <span id="brand-badge-name">Ładowanie brandu...</span>
+    </div>
+    
+    <div class="editor-box" id="static-engine-info">
+        <div style="display: flex; gap: 30px; flex-wrap: wrap;">
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px;">
+                <div style="background: rgba(0,0,0,0.05); padding: 10px 20px; border-radius: 50px; border: 1px solid var(--ui-border); display: flex; align-items: center; gap: 8px; font-family: var(--font-body); color: var(--ui-text);">
+                    <span style="font-weight: bold; font-family: var(--font-title);">Silnik tekstu:</span> 🌸 DeepSeek PRO
+                </div>
+                <div style="background: rgba(0,0,0,0.05); padding: 10px 20px; border-radius: 50px; border: 1px solid var(--ui-border); display: flex; align-items: center; gap: 8px; font-family: var(--font-body); color: var(--ui-text);">
+                    <span style="font-weight: bold; font-family: var(--font-title);">Silnik grafiki (okładka):</span> 🌌 Grok
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ideation-row">
+        <div class="editor-box" id="ideationBox">
+            <h3 style="margin-top: 0; margin-bottom: 15px; color: var(--ui-title-color); font-family: var(--font-title); font-size: 24px;">💡 Pomysły na karuzelę</h3>
+            <input type="text" id="ideationTopic" placeholder="Określ zakres tematyczny (np. panowanie nad emocjami)">
+            <button class="btn btn-ai-gen" id="btnIdeation" onclick="generateIdeas()" style="width:100%; margin-top: 15px;">GENERUJ POMYSŁY</button>
+            <button class="btn btn-startup-assistant" id="btn-startup-assistant" onclick="openStartupAssistant()" style="display: none;">ASYSTENT ROZRUCHU</button>
+            <div id="ideationResults" style="display:none; margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <div id="main-editor-box" class="editor-box" style="position: relative;">
+        <button id="btn-toggle-saved-panel" onclick="toggleSavedIdeasPanel()" style="display: none; position: absolute; right: -48px; top: 100px; background: var(--ui-surface); border: 1px solid var(--ui-border); border-left: none; border-radius: 0 8px 8px 0; padding: 15px 5px; cursor: pointer; z-index: 2; box-shadow: 4px 0 10px rgba(0,0,0,0.05); width: 48px; text-align: center;" title="Zapisane tematy">
+            <span style="font-size: 20px; display: block; margin-bottom: 10px;">📚</span>
+            <span style="display: inline-block; writing-mode: vertical-rl; transform: rotate(180deg); font-family: var(--font-body); font-size: 15px; text-transform: uppercase; letter-spacing: 1px; color: var(--ui-text); font-weight: bold;">Zapisane tematy</span>
+        </button>
+
+        <div id="saved-ideas-panel" style="display: none; position: absolute; right: -350px; top: 100px; width: 300px; background: var(--ui-surface); border: 1px solid var(--ui-border); border-radius: 12px; box-shadow: -4px 4px 20px rgba(0,0,0,0.15); padding: 20px; z-index: 100; max-height: 600px; overflow-y: auto; opacity: 0; pointer-events: none; transform: translateX(20px); transition: opacity 0.3s ease, transform 0.3s ease;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--ui-border); padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 style="margin: 0; color: var(--ui-title-color); font-family: var(--font-title); font-size: 18px;">📚 Zapisane tematy</h3>
+                <button onclick="toggleSavedIdeasPanel()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--ui-text);">❌</button>
+            </div>
+            <div id="saved-ideas-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
+        </div>
+
+        <h3 id="tytul-edytora" style="margin-top: 0; margin-bottom: 15px; color: var(--ui-title-color); font-family: var(--font-title); font-size: 24px;">📝 Edytor Treści</h3>
+        <textarea id="inputText" placeholder="Slajd 1: ..."></textarea>
+        <div class="editor-actions-grid">
+            <div class="editor-actions-row">
+                <button class="btn btn-ai-gen" onclick="askAI()">✨ AI: NAPISZ TREŚĆ</button>
+                <button class="btn btn-gen-slides" onclick="generateKaruzela()">🖼️ GENERUJ SLAJDY</button>
+            </div>
+            <div class="editor-actions-row">
+                <button id="btn-generate-fb" class="btn btn-fb" onclick="generateFB()">📱 GENERUJ POST FB</button>
+                <button class="btn btn-pdf-top" id="btn-pdf-top" onclick="downloadPDF(this)">📄 POBIERZ PDF DLA LINKEDIN</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="previewArea"></div>
+
+    <section id="reels-poc-section" class="reels-section-box" hidden>
+    <div class="reels-header">
+        <p class="reels-eyebrow">REELS</p>
+        <h3 class="reels-title">🎬 Slajdy do Reels</h3>
+        <p class="reels-helper">Aplikacja zmontuje wszystkie slajdy w jeden płynny, bezdźwięczny film MP4. Uzbrój się w cierpliwość, to może chwilę potrwać.</p>
+    </div>
+    <div class="reels-layout-container">
+        <div class="reels-player-column">
+            <div class="reels-video-card">
+                <div id="reels-video-placeholder" class="reels-placeholder">
+                    <span>Tutaj pojawi się zmontowany film</span>
+                </div>
+                <video id="reels-final-video" class="reels-video-element" controls playsinline loop hidden></video>
+            </div>
+        </div>
+        <div class="reels-controls-column">
+            <div class="reels-control-group">
+                <p class="reels-control-label">CZAS WYŚWIETLANIA SLAJDU:</p>
+                <div class="reels-duration-selector">
+                    <button type="button" class="btn-duration is-active" data-duration="4" onclick="window.setReelsDuration(4)">⏱️ 4 sekundy</button>
+                    <button type="button" class="btn-duration" data-duration="5" onclick="window.setReelsDuration(5)">⏱️ 5 sekund</button>
+                </div>
+            </div>
+            <div class="reels-control-group">
+                <p class="reels-control-label">WYBIERZ TŁO I GENERUJ FILM:</p>
+                <div class="reels-action-buttons">
+                    <button type="button" class="btn btn-slide-r1-left" id="btn-reels-render-light" onclick="window.generateUnifiedReelsMovie('light')">GENERUJ FILM LIGHT</button>
+                    <button type="button" class="btn btn-gen-slides" id="btn-reels-render-dark" onclick="window.generateUnifiedReelsMovie('dark')">GENERUJ FILM DARK</button>
+                    <button type="button" class="btn btn-slide-r1-left" id="btn-reels-custom-bg" onclick="window.chooseCustomReelsBackground()" hidden>REEL WŁASNE TŁO</button>
+                </div>
+            </div>
+            <div id="reels-progress-wrap" class="reels-progress-wrapper" hidden>
+                <div class="reels-progress-info">
+                    <span id="reels-progress-status">Montowanie filmu...</span>
+                    <span id="reels-progress-percent">0%</span>
+                </div>
+                <div class="progress-bar-container reels-progress-bar">
+                    <div id="reels-progress-fill" class="progress-bar-fill"></div>
+                </div>
+            </div>
+            <div id="reels-result-actions" class="reels-result-actions" hidden>
+                <button type="button" id="btn-reels-refresh" class="reels-result-button" onclick="window.refreshUnifiedReelsMovie()">ODŚWIEŻ</button>
+                <a id="btn-reels-download" class="reels-result-button" href="#" download>POBIERZ</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <div id="div-fb-section" style="display: none;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; width: 100%;">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; gap: 20px; width: 100%; height: 100%;">
+                <button id="btn-action-fb" class="btn btn-fb" style="width: 100%; flex: none;" onclick="generateFB()">📱 GENERUJ GRAFIKĘ FB</button>
+                <div id="fbArea" style="display:none; flex-direction: column; align-items: center; width: 100%;">
+                    <h3 style="color: var(--ui-title-color); font-family: var(--font-title); margin-bottom: 15px; margin-top: 0;">📱 Grafika na Facebook</h3>
+                    <div class="fb-scale-wrapper">
+                        <div id="fb-final-image" class="fb-post-preview">
+                            <div id="fbPreHook" class="fb-pre-hook"></div>
+                            <div id="fbHookContent" class="fb-hook-text"></div>
+                            <div id="fbFooterText" class="fb-footer-branding"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: center;">
+                        <button class="btn-scale-img" id="fbZoomInBtn" style="display: none;">🖼️ +</button>
+                        <button class="btn-scale-img" id="fbZoomOutBtn" style="display: none;">🖼️ −</button>
+                        <button class="btn-scale-img" id="fbLayoutTopBtn" style="display: none; font-size: 14px; padding: 10px 15px;" onclick="window.toggleFbLayout('top')">Tytuł 🔼</button>
+                        <button class="btn-scale-img" id="fbLayoutBottomBtn" style="display: none; font-size: 14px; padding: 10px 15px;" onclick="window.toggleFbLayout('bottom')">Tytuł 🔽</button>
+                        <button class="btn btn-gen-slides" onclick="downloadFB()" style="width: auto; min-width: 200px;">⬇️ POBIERZ GRAFIKĘ FB</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="fb-right-panel" style="display: flex; flex-direction: column; align-items: center; justify-content: flex-start; width: 100%; height: 100%;">
+                <button id="btn-action-story" class="btn btn-ig-story" style="width: 100%; flex: none;" onclick="generateStory()">📱 GENERUJ SLAJD DLA STORY</button>
+                <div id="storyArea" style="display:none; flex-direction: column; align-items: center; width: 100%; margin-top: 20px;">
+                    <h3 style="color: var(--ui-title-color); font-family: var(--font-title); margin-bottom: 15px; margin-top: 0;">📱 Story (9:16)</h3>
+                    <div class="story-scale-wrapper">
+                        <div id="story-final-image" class="story-post-preview">
+                            <div id="storyPreHook" class="fb-pre-hook"></div>
+                            <div id="storyHookContent" class="fb-hook-text"></div>
+                            <div id="storyFooterText" class="fb-footer-branding"></div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: center;">
+                        <button class="btn-scale-img" id="storyZoomInBtn" style="display: none;">🖼️ +</button>
+                        <button class="btn-scale-img" id="storyZoomOutBtn" style="display: none;">🖼️ −</button>
+                        <button class="btn-scale-img" id="storyLayoutTopBtn" style="display: none; font-size: 14px; padding: 10px 15px;" onclick="window.toggleStoryLayout('top')">Tytuł 🔼</button>
+                        <button class="btn-scale-img" id="storyLayoutBottomBtn" style="display: none; font-size: 14px; padding: 10px 15px;" onclick="window.toggleStoryLayout('bottom')">Tytuł 🔽</button>
+                        <button class="btn btn-gen-slides" onclick="downloadStory()" style="width: auto; min-width: 200px;">⬇️ POBIERZ STORY</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="div-buttons-section" style="display: none;">
+    <div class="social-generation-grid">
+        <div class="social-generation-row">
+            <button id="btn-generate-fb-text" class="btn btn-fb" onclick="generateFacebookText()">📘 GENERUJ TEKST POSTA FB</button>
+            <button id="btn-generate-ig" class="btn btn-ig-text" onclick="generateIGCaption()">📸 GENERUJ TEKST IG</button>
+        </div>
+        <div class="social-generation-row social-generation-row-bottom">
+            <button id="btn-generate-reel" class="btn btn-reel" onclick="generateReelScript()">🎬 GENERUJ SCENARIUSZ ROLKI</button>
+            <button id="btn-generate-blog" class="btn btn-blog-text" onclick="generateBlogArticle()">📝 GENERUJ ARTYKUŁ NA BLOGA</button>
+        </div>
+        <button class="btn btn-zip-bottom" onclick="downloadZIP(this)" style="grid-column: 1 / -1; width: 100%; margin: 0;">📦 POBIERZ CAŁOŚĆ W ZIP</button>
+    </div>
+</div>
+
+    <div id="div-text-section" style="display: none;">
+        <div id="textWindowsContainer" style="display: flex; gap: 20px; width: 100%; flex-wrap: wrap; margin-top: 30px;"></div>
+    </div>
+
+    <div id="blog-cover-section" style="max-width: 1000px; margin: 40px auto 20px auto; width: 100%; display: none; flex-direction: column; align-items: center;">
+        <h3 style="color: var(--ui-section-title-color); font-family: var(--font-title); margin-bottom: 20px; margin-top: 0; width: 100%; text-align: left;">🎨 Okładka artykułu na bloga</h3>
+        <div class="blog-scale-wrapper">
+            <div style="position: absolute; top: 10px; right: 10px; z-index: 1000; display: flex; gap: 5px; background: var(--ui-surface); padding: 5px; border-radius: 8px; border: 1px solid var(--ui-border); box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <button onclick="document.getElementById('blog-hook-container').style.setProperty('text-align', 'left', 'important')" style="background: transparent; border: none; cursor: pointer; color: var(--ui-text); display: flex; align-items: center; justify-content: center; padding: 4px;" title="Równaj do lewej"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="15" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+                <button onclick="document.getElementById('blog-hook-container').style.setProperty('text-align', 'center', 'important')" style="background: transparent; border: none; cursor: pointer; color: var(--ui-text); display: flex; align-items: center; justify-content: center; padding: 4px;" title="Wyśrodkuj"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="7" y1="12" x2="17" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+                <button onclick="document.getElementById('blog-hook-container').style.setProperty('text-align', 'right', 'important')" style="background: transparent; border: none; cursor: pointer; color: var(--ui-text); display: flex; align-items: center; justify-content: center; padding: 4px;" title="Równaj do right"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="9" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+            </div>
+            <div id="blog-final-image">
+                <div class="blog-hook-text" id="blog-hook-container" style="position: relative; z-index: 99; outline: none; display: inline-block !important; width: fit-content !important; max-width: 90%; margin: 60px auto 0 auto; text-align: center;">
+                    <div id="blog-hook-bg" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;"></div>
+                    <div id="blog-hook-text-content" style="position: relative; z-index: 1;">Brak tytułu</div>
+                </div>
+                <div id="blog-unified-scaling-box" style="width: 100%; position: relative; margin-top: 40px; display: block;"></div>
+            </div>
+        </div>
+        <div id="blog-thumbnails-container" style="display: flex; gap: 5px; margin-top: 5px; margin-bottom: 5px; width: 1000px; justify-content: flex-start;"></div>
+        <div style="display: flex; gap: 10px; justify-content: space-between; width: 1000px;">
+            <div style="display: flex; gap: 10px; flex-1;">
+                <button class="btn-scale-img" style="flex: 1; padding: 15px 10px 15px 10px; border: 1px solid var(--ui-border); background-color: var(--ui-ctrl-bg, #f0f0f0); color: var(--ui-ctrl-text, #333);" onclick="window.scaleBlogImage(0.1)">🖼️ +</button>
+                <button class="btn-scale-img" style="flex: 1; padding: 15px 10px 15px 10px; border: 1px solid var(--ui-border); background-color: var(--ui-ctrl-bg, #f0f0f0); color: var(--ui-ctrl-text, #333);" onclick="window.scaleBlogImage(-0.1)">🖼️ −</button>
+            </div>
+            <button class="btn btn-slide-r1-right" style="flex: 2; padding: 10px; margin-left: 0;" onclick="window.uploadBlogImage()">📤 Wgraj inną</button>
+            <button class="btn btn-slide-r2-right" style="flex: 2; padding: 10px; margin-left: 0;" onclick="window.downloadBlogCover()">⬇️ Pobierz grafikę w formacie webp</button>
+        </div>
+    </div>
+    
+        <div id="final-download-section" class="final-download-section" style="display: none;">
+        <button id="btn-zip-final" class="btn btn-zip-final" onclick="downloadZIP(this)">📦 POBIERZ CAŁOŚĆ W ZIP</button>
+    </div>
+
+<div class="archive-section" id="archiveSection" style="display: none;">
+        <h3 class="archive-title">📦 Twoje zabezpieczenie: archiwum 10 ostatnio pobranych karuzel</h3>
+        <div class="archive-grid" id="archiveGrid"></div>
+    </div>
+</div>
+
+<div id="render-temp"></div>
+
+<div id="startup-assistant-modal" class="startup-modal" aria-hidden="true">
+    <div class="startup-modal-backdrop" aria-hidden="true"></div>
+    <section class="startup-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="startup-modal-title">
+        <div class="startup-modal-header">
+            <div>
+                <p class="startup-eyebrow" id="startup-modal-mode">Asystent Rozruchu — Strateg Contentowy</p>
+                <h2 id="startup-modal-title">Ułóżmy Twój plan publikacji na cały miesiąc</h2>
+            </div>
+            <button type="button" class="startup-icon-button" onclick="closeStartupAssistant()" aria-label="Zamknij rozmowę">×</button>
+        </div>
+        <div id="startup-chat-log" class="startup-chat-log" aria-live="polite"></div>
+        <div id="startup-result" class="startup-result" hidden></div>
+        <div class="startup-chat-composer">
+            <textarea id="startup-message-input" rows="3" placeholder="Napisz, czym się zajmujesz, komu pomagasz lub co jest teraz najważniejsze w Twojej komunikacji."></textarea>
+            <div class="startup-chat-actions">
+                <button type="button" class="btn btn-startup-secondary" id="btn-startup-back" onclick="returnToStartupConversation()" style="display: none;">WRÓĆ DO ROZMOWY</button>
+                <button type="button" class="btn btn-startup-primary" id="btn-startup-send" onclick="sendStartupMessage()">WYŚLIJ</button>
+            </div>
+        </div>
+    </section>
+</div>
+
+<script src="https://cp-core-engine.pages.dev/karusoula-engine-v2.js?v=1"></script>
+
+</body>
+</html>
