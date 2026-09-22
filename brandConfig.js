@@ -27,7 +27,8 @@ const brandConfig = {
         blobColor: 'linear-gradient(135deg, var(--brand-main) 0%, var(--brand-accent) 50%, #4a7c59 100%)',
         textColor: '#0F281B',
         audioLoopPath: 'https://raw.githubusercontent.com/KaruSoula/assets/main/Generating.mp3',
-        audioSuccessPath: 'https://raw.githubusercontent.com/KaruSoula/assets/main/bell-success.mp3'
+        audioSuccessPath: 'https://raw.githubusercontent.com/KaruSoula/assets/main/bell-success.mp3',
+        zipSuccessPath: 'https://raw.githubusercontent.com/KaruSoula/assets/main/Clapping-Applause-Short.mp3'
       },        
     
     // ============================================
