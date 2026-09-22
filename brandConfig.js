@@ -242,6 +242,12 @@ Układaj treści wokół świadomego kontaktu z twarzą, relacji między napięc
             marginBottom: "50px"
         }
     },
+    
+    reelCover: {
+        titleRadius: "12px", // zaokrąglenie tła pod tytułem okładki Reela
+        titlePadding: "15px 20px", // wewnętrzny odstęp między tekstem a tłem
+        titleLineHeight: "1.2" // odstęp między wierszami tytułu
+    },
 
     // ============================================
     // CZCIONKI
